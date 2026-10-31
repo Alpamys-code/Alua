@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>В моём сердце — Особенная история</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Ambient background canvas for floating embers and crimson particles -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Sound & Navigation HUD -->
+  <header class="hud-header">
+    <div class="hud-brand">
+      <span class="pulse-dot"></span>
+      <span class="hud-bpm"><span id="bpm-counter">72</span> BPM</span>
+    </div>
+    <div class="hud-controls">
+      <button id="btn-autoplay" class="hud-btn" type="button" aria-label="Авто-просмотр">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <span class="btn-text">Автоплей</span>
+      </button>
+      <button id="btn-sound" class="hud-btn" type="button" aria-label="Включить звук сердца">
+        <svg id="icon-sound-off" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+          <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+        <svg id="icon-sound-on" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <span id="sound-status-text" class="btn-text">Звук: Выкл</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Top Progress Bar -->
+  <div class="progress-track" aria-hidden="true">
+    <div id="progress-bar" class="progress-fill"></div>
+  </div>
+
+  <!-- FIXED VIEWPORT: Always pinned to screen on mobile & desktop, immune to sticky scroll bugs -->
+  <div id="main-viewport" class="fixed-viewport">
+
+    <!-- Radial background vignette with pulsing heart glow -->
+    <div id="core-glow" class="core-glow"></div>
+
+    <!-- Intro Title Section (Fades out smoothly on scroll/zoom) -->
+    <div id="intro-card" class="intro-overlay">
+      <span class="sub-badge">Биоритм души</span>
+      <h1 class="main-title">В глубине сердца</h1>
+      <p class="intro-desc">Прокрути вниз или проведи пальцем</p>
+      <div class="scroll-mouse-indicator">
+        <div class="mouse-shell">
+          <div class="mouse-wheel"></div>
+        </div>
+        <span class="chevron-arrow"></span>
+      </div>
+    </div>
+
+    <!-- 3D Heart Visual Stage -->
+    <div id="heart-stage" class="heart-stage">
+      <div id="heart-wrapper" class="heart-wrapper idle-beat">
+        <img id="heart-img" class="heart-img" src="images/heart.jpg" alt="Анатомическое человеческое сердце" />
+        <div class="heart-inner-portal"></div>
+      </div>
+    </div>
+
+    <!-- Secret Inner Photo Stage (Revealed deep inside the heart) -->
+    <div id="photo-stage" class="photo-stage">
+      <div id="photo-card" class="photo-card">
+        <div class="photo-frame">
+          <img id="photo-img" class="photo-img" src="images/photo.png" alt="Ты в моём сердце" />
+          <div class="photo-glimmer"></div>
+        </div>
+
+        <!-- Reveal Message -->
+        <div id="reveal-content" class="reveal-content">
+          <div class="heart-icon-mini">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <h2 id="custom-title" class="reveal-title">Ты — в самом моём сердце</h2>
+          <p id="custom-text" class="reveal-text">Каждый его удар принадлежит только тебе. Спасибо, что ты есть рядом.</p>
+          
+          <div class="action-buttons">
+            <button id="btn-restart" class="action-btn primary-btn" type="button">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              <span>Начать сначала</span>
+            </button>
+            <button id="btn-edit" class="action-btn secondary-btn" type="button">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <span>Изменить слова</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Mobile-Friendly Interactive Scrubber Slider -->
+  <div class="bottom-scrubber-bar">
+    <button id="btn-scrub-top" class="scrub-step-btn" type="button" aria-label="В начало">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
+    <div class="slider-wrapper">
+      <input type="range" id="progress-slider" min="0" max="1000" value="0" step="1" aria-label="Регулятор погружения в сердце" />
+    </div>
+    <button id="btn-scrub-end" class="scrub-step-btn" type="button" aria-label="Вглубь к фото">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Native Scroll Spacer to drive smooth page scrolling -->
+  <div id="scroll-spacer" class="scroll-spacer"><main id="scroll-stage"></main></div>
+
+  <!-- Edit Message Modal -->
+  <div id="edit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-heading">Изменить текст признания</h3>
+        <button id="btn-close-modal" class="btn-close" type="button" aria-label="Закрыть">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="input-title">Заголовок:</label>
+        <input type="text" id="input-title" maxlength="60" value="Ты — в самом моём сердце" />
+        
+        <label for="input-text">Сообщение / Слова любви:</label>
+        <textarea id="input-text" rows="3" maxlength="240">Каждый его удар принадлежит только тебе. Спасибо, что ты есть рядом.</textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel-modal" class="modal-btn secondary-btn" type="button">Отмена</button>
+        <button id="btn-save-modal" class="modal-btn primary-btn" type="button">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
